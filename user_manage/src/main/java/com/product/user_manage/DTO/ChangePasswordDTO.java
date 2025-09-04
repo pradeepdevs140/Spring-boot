@@ -1,7 +1,5 @@
 package com.product.user_manage.DTO;
 
-import lombok.Data;
-
 
 public class ChangePasswordDTO {
 

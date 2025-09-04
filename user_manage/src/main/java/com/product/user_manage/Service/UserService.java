@@ -1,6 +1,7 @@
 package com.product.user_manage.Service;
 
 import java.util.List;
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class UserService {
 		user.setPassword(passwordEncoder.encode(changePasswordDTO.getCurrentPassword()));
 		User savedUser = userRepository.save(user);
 	
-		return convertToUserDTO(user);
+		return convertToUserDTO(savedUser);
 	}
 	public UserDTO updateUser(Long id , UserDTO userDTO) {
 		User user = new User();

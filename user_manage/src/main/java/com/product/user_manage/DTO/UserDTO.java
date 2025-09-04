@@ -1,10 +1,9 @@
 package com.product.user_manage.DTO;
 
 import jakarta.validation.constraints.Email;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-
 public class UserDTO {
 	public UserDTO(Long id, @NotBlank @Size(min = 3, max = 50) String username,
 			@NotBlank @Size(min = 70) @jakarta.validation.constraints.Email String email) {
