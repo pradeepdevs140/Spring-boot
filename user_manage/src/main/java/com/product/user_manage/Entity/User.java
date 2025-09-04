@@ -1,7 +1,13 @@
 package com.product.user_manage.Entity;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -12,116 +18,142 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import lombok.Data;
 
 @Entity
-@Table(name =  "users")
+@Table(name = "users")
+public class User implements UserDetails {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-public class User {
-	 public User(long id, String username, String password, String email, Boolean isactive, LocalDateTime createdAt,
-			LocalDateTime updatedAt, Set<String> roles) {
-		super();
-		this.id = id;
-		Username = username;
-		Password = password;
-		this.email = email;
-		this.isactive = isactive;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-		this.roles = roles;
-	}
-	 public  User() {
-		 
-	 }
+    private String username;
+    private String password;
+    private String email;
+    private Boolean isActive = true;
 
-	public long getId() {
-		return id;
-	}
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> roles;
 
-	public String getUsername() {
-		return Username;
-	}
+    public User() {}
 
-	public void setUsername(String username) {
-		Username = username;
-	}
+    public User(long id, String username, String password, String email,
+                Boolean isActive, LocalDateTime createdAt, LocalDateTime updatedAt,
+                Set<String> roles) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.isActive = isActive;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.roles = roles;
+    }
 
-	public String getPassword() {
-		return Password;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public void setPassword(String password) {
-		Password = password;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    @Override
+    public String getUsername() {
+        return username;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public Boolean getIsactive() {
-		return isactive;
-	}
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
-	public void setIsactive(Boolean isactive) {
-		this.isactive = isactive;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
+    public Boolean getIsActive() {
+        return isActive;
+    }
 
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
 
-	public Set<String> getRoles() {
-		return roles;
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-	public void setRoles(Set<String> roles) {
-		this.roles = roles;
-	}
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	@Id
-	 @GeneratedValue(strategy = GenerationType.IDENTITY) 
-	private long id;
-	private String Username ;
-	private String Password;
-	private String email;
-	private Boolean isactive = true;
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
-	
-	@ElementCollection(fetch = FetchType.EAGER)
-	private  Set<String> roles;
-	
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = LocalDateTime.now();
-	}
-	
-	@PreUpdate
-	protected void onUpdate() {
-		this.updatedAt = LocalDateTime.now();
-	}
-	
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive != null ? isActive : true;
+    }
 }
